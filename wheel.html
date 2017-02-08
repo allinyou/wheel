@@ -1,0 +1,116 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>轮播图</title>
+	<meta name="viewport" content="width=device-width">
+</head>
+<style>
+body{
+	margin:0;
+}
+.win{
+	width:100%;
+	overflow: hidden;
+}
+.wheel{
+	height:auto;
+	overflow:hidden;
+	border-bottom:1px solid red; 
+}
+.wheel>div{
+	float:left;
+	line-height:0;
+}
+/*子元素img（行内块元素）与文本的有默认的line-height，*/
+.wheel img{
+	width:100%;
+	float:left;
+}
+</style>
+<body>
+	<div class="win">
+       <div class="wheel">
+         <div>      
+            <a href="http://www.baidu.com"><img src="img/1.jpg" alt=""></a>
+         </div>    
+         <div>      
+            <a href="http://www.baidu.com"><img src="img/2.jpg" alt=""></a>
+         </div> 
+         <div>      
+            <a href="http://www.baidu.com"><img src="img/3.jpg" alt=""></a>
+         </div> 
+         <div>      
+            <a href="http://www.baidu.com"><img src="img/4.jpg" alt=""></a>
+         </div> 
+         <div>      
+            <a href="http://www.baidu.com"><img src="img/5.jpg" alt=""></a>
+         </div> 
+       </div>
+	</div>
+</body>
+</html>
+<script>
+var cw=document.documentElement.clientWidth;
+var win=document.querySelector('.win');
+var wheel=document.querySelector('.wheel');
+var divs=document.querySelectorAll('.wheel>div');
+wheel.style.width=cw*divs.length+'px';
+for(var i=0;i<divs.length;i++){
+	divs[i].style.width=cw+'px';
+}
+var index=0;//下标;
+
+var t=setInterval(automove,3000);
+function automove(){
+	index++;
+	if(index==divs.length){
+        index=0;
+	}	
+	wheel.style.transition='transform 0.3s ease-in-out';
+	wheel.style.transform='translateX(-'+index*cw+'px)';
+}
+wheel.addEventListener('touchstart',function(e){
+	clearInterval(t);
+	wheel.style.transition='';
+	var se=e.targetTouches[0];
+    var scw=se.clientX;
+    var mcw=0;
+    var st=e.timeStamp;
+    wheel.addEventListener('touchmove',move)
+    function move(e){
+    	var me=e.targetTouches[0];
+    	mcw=me.clientX;
+    	wheel.style.transform='translateX('+(mcw-scw-index*cw)+'px)';
+    }
+    wheel.addEventListener('touchend',end);
+    function end(e){
+       var et=e.timeStamp;
+       var time=et-st;
+       var ecw=e.changedTouches[0].clientX;
+       var range=Math.abs(ecw-scw);
+       wheel.style.transition='transform 0.1s';
+       if(Math.abs(mcw-scw)>cw/2||(time<120&&range>30)){ 
+           if(mcw-scw>0){
+           	  index--;
+           }else{
+           	  index++;
+           }
+           if(index==divs.length){
+           	   index=divs.length-1;          	   
+           }
+           if(index==-1){
+           	   index=0;
+           }      	            
+           wheel.style.transform='translateX(-'+index*cw+'px)';  
+       }else{      	   
+       	   wheel.style.transform='translateX(-'+index*cw+'px)';
+       }
+       wheel.removeEventListener('touchmove',move);
+       wheel.removeEventListener('touchend',end);
+       t=setInterval(automove,3000);
+    }
+})
+
+</script>
